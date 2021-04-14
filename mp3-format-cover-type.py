@@ -6,6 +6,7 @@
 import os
 import eyed3
 import time
+import re
 
 REMOVE_TAG_ID3V1 = True
 REMOVE_TAG_GENRE = True
@@ -51,6 +52,7 @@ for path, subdirs, files in os.walk(os.getcwd()):
 					status['name'] = name;
 					if CONVERT_TAG_TO_FILENAME:
 						status['name'] = audio.tag.title + ' - ' + audio.tag.artist + '.mp3'
+						status['name'] = re.sub(r'[/|\\]', r'', status['name'])
 						if name != status['name']:
 							status['status'] += 'R'
 					os.rename(tempname, status['name'])
