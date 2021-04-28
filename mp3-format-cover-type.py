@@ -12,10 +12,6 @@ parser.add_argument('files',
 					action='store',
 					nargs='+',
 					help='mp3 files')
-parser.add_argument('-t', 
-					action='store_true',
-					dest='preserve_filename',
-					help='preserve file name (disable convert tag \'title - artist\' to file name)')
 parser.add_argument('-p',
 					action='store_true',
 					dest='preserve_id3v1',
@@ -34,13 +30,15 @@ for f in args.files:
 				audio.tag.remove(f, version=eyed3.id3.ID3_V1, preserve_file_time=True)
 			if audio.tag.images is not None and len(audio.tag.images) > 0:
 				for i in audio.tag.images:
+					i.description = ''
 					if i.picture_type is not eyed3.id3.frames.ImageFrame.OTHER:
 						i.picture_type = eyed3.id3.frames.ImageFrame.OTHER
+			audio.tag.album_artist = None
+			audio.tag.genre = None
 			audio.tag.save(preserve_file_time=True)
-			if not args.preserve_filename:
-				tag_filename = audio.tag.title + ' - ' + audio.tag.artist
-				if pathlib.Path(f).stem != tag_filename:
-					audio.rename(tag_filename, preserve_file_time=True);
+			tag_filename = audio.tag.title + ' - ' + audio.tag.artist
+			if pathlib.Path(f).stem != tag_filename:
+				audio.rename(tag_filename, preserve_file_time=True);
 		print(f + ' -> ok');
 	except Exception as e:
 		wait_input = True
